@@ -1,9 +1,7 @@
 import { Context, Elysia } from "elysia";
 import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
-import userRouter from "./routes/user"
-import postRouter from "./routes/post"
-import authRouter from "./routes/auth"
+import router from "./routes";
 
 const PORT = 3001;
 const app = new Elysia();
@@ -19,9 +17,7 @@ app.get("/", ({ set, error }) => {
 })
 
 /* Routes */
-app.use(userRouter);
-app.use(postRouter);
-app.use(authRouter);
+app.use(router);
 
 /* Run Server */
 app.listen(PORT);
