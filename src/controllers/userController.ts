@@ -82,6 +82,19 @@ export const updateUserInfo = async ({set, body, params }: Context) => {
 
     try {
         const { userId } = params;
+        const parsedUserId = Number(userId);
+
+        const user = await prisma.user.update({
+            where: {
+                id: parsedUserId,
+            },
+            data: {
+                ...body,
+            },
+        });
+
+        return user;
+        
     } catch (err) {
         set.status = 500;
         return { error: err };        

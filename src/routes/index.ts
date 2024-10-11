@@ -1,7 +1,7 @@
 import { Elysia } from 'elysia'
-import authRouter from "./auth"
-import userRouter from "./user"
-import postRouter from "./post"
+import authRouter from "./authRoutes"
+import userRouter from "./userRoutes"
+import postRouter from "./postRoutes"
 
 const router = new Elysia();
 /* main router: guarding for core logic endpoints, auth endpoints can be access without token */

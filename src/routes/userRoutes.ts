@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { followUser, getAllUsers, getUserById, getUserFollowings, updateUserInfo } from "../controllers/user";
+import { followUser, getAllUsers, getUserById, getUserFollowings, updateUserInfo } from "../controllers/userController";
 
 const router = new Elysia({ prefix: "/users" })
     .get("/", getAllUsers)
