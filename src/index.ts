@@ -11,7 +11,7 @@ app.use(cors());
 app.use(swagger())
 
 /* / */
-app.get("/", ({ set, error }) => {
+app.get("/", ({ set, error }: Context) => {
     set.status = 200;
     return "Hello, Elysia"
 })
