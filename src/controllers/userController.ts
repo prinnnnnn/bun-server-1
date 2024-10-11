@@ -34,6 +34,7 @@ export const getUserById = async ({ params, set }: Context) => {
 
         if (!user) {
             set.status = 404;
+            return { message: "User not found" }
         }
 
         return user;
@@ -82,18 +83,17 @@ export const updateUserInfo = async ({set, body, params }: Context) => {
 
     try {
         const { userId } = params;
-        const parsedUserId = Number(userId);
+        // const parsedUserId = Number(userId);
 
-        const user = await prisma.user.update({
-            where: {
-                id: parsedUserId,
-            },
-            data: {
-                ...body,
-            },
-        });
+        // const user = await prisma.user.update({
+        //     where: {
+        //         id: parsedUserId,
+        //     },
+        //     data: body,
+        // });
 
-        return user;
+        // return user;
+        return { message: "Not yet implement" };
         
     } catch (err) {
         set.status = 500;
