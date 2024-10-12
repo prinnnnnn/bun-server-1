@@ -1,5 +1,5 @@
 import { Context } from "elysia"
 
-export const verifyToken = ({}: Context) => {
+export const verifyToken = ({ }: Context) => {
     
 }
