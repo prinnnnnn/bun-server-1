@@ -3,13 +3,20 @@ import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
 import router from "./routes";
 import { logger } from "./guards/logger";
+import { jwt } from "@elysiajs/jwt";
 
-const PORT = 3001;
+const PORT = process.env.PORT!;
 const app = new Elysia();
 
 /* Configurations */
 app.use(cors());
 app.use(swagger());
+app.use(
+    jwt({
+        name: 'myJWTNamespace',
+        secret: process.env.JWT_SECRET!
+    })
+)
 logger(app);
 
 /* / */

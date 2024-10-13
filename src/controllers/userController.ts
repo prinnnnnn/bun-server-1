@@ -4,7 +4,6 @@ import prisma from "../config/prisma";
 /* GET - / (for test only) */
 export const getAllUsers = async ({ set }: Context) => {
 
-    // console.log(`Retrieving all users from db...`);
     try {
         
         const users = await prisma.user.findMany();
@@ -28,7 +27,7 @@ export const getUserById = async ({ params, error, set }: Context) => {
     try {
         
         const { userId } = params;
-        console.log(typeof userId);
+        // console.log(typeof userId);
 
         const user = await prisma.user.findUnique({ where: { id: Number(userId) }});
 
@@ -102,7 +101,7 @@ export const updateUserInfo = async ({set, body, params }: Context) => {
 
 }
 
-/* PATCh - /:userId/:followId */
+/* PATCH - /:userId/:followId */
 export const followUser = async ({ set, params }: Context) => {
 
     try {
