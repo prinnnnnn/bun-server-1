@@ -33,7 +33,7 @@ export const getFollowersPost = async ({ params, set, error }: Context) => {
             )
         );
 
-        const feedPosts = fetchedPosts.flat(); 
+        const feedPosts = fetchedPosts.flat();
 
         if (!feedPosts) {
             error(404);
@@ -52,9 +52,9 @@ export const getFollowersPost = async ({ params, set, error }: Context) => {
 
 /* POST - /posts/ */
 export const createPost = async ({ set, error, body }: Context) => {
-    
+
     try {
-        
+
         const newPost = await prisma.post.create({
             /* @ts-ignore: Unreachable code error */
             data: body,
@@ -62,7 +62,40 @@ export const createPost = async ({ set, error, body }: Context) => {
 
         set.status = 201;
         return newPost;
- 
+
+    } catch (err) {
+        error(500);
+        return { error: err }
+    }
+
+}
+
+/* PATCH - /posts/:userId/:postId */
+export const likePost = async ({ set, error, params }: Context) => {
+
+    try {
+
+        const { userId, postId } = params;
+
+        let likeRecord = await prisma.postLike.delete({
+            where: {
+                id: 1,
+                // userId: Number(userId), 
+                // postId: Number(postId),
+            }
+        })
+
+        if (!likeRecord) {
+            likeRecord = await prisma.postLike.create({
+                data: {
+                    userId: Number(userId),
+                    postId: Number(postId),
+                }
+            })
+        }
+
+        return;
+
     } catch (err) {
         error(500);
         return { error: err }

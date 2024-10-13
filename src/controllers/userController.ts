@@ -4,8 +4,7 @@ import prisma from "../config/prisma";
 /* GET - / (for test only) */
 export const getAllUsers = async ({ set }: Context) => {
 
-    console.log(`Retrieving all users from db...`);
-
+    // console.log(`Retrieving all users from db...`);
     try {
         
         const users = await prisma.user.findMany();
@@ -24,17 +23,18 @@ export const getAllUsers = async ({ set }: Context) => {
 }
 
 /* GET - /:userId */
-export const getUserById = async ({ params, set }: Context) => {
+export const getUserById = async ({ params, error, set }: Context) => {
     
     try {
         
         const { userId } = params;
+        console.log(typeof userId);
 
         const user = await prisma.user.findUnique({ where: { id: Number(userId) }});
 
         if (!user) {
             set.status = 404;
-            return { message: "User not found" }
+            return { message: "User not found" };
         }
 
         return user;
