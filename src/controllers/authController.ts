@@ -39,7 +39,7 @@ interface loginBody {
 }
 
 /* /auth/login */
-export const login = async ({ body, set }: Context) => {
+export const login = async ({ body, set, jwt, cookie: { token } }: Context) => {
     
     try {
 
@@ -65,7 +65,13 @@ export const login = async ({ body, set }: Context) => {
             return { message: "Username or Password is incorrect" };
         }
 
-        return userResponse;
+        token.value = await jwt.sign({
+            email,
+        });
+
+        return {
+            user: userResponse,
+        };
         
         
     } catch (err) {

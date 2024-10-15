@@ -1,17 +1,28 @@
-import { Elysia } from 'elysia'
+import { Context, Elysia } from 'elysia'
 import { jwt } from '@elysiajs/jwt'
 import authRouter from "./authRoutes"
 import userRouter from "./userRoutes"
 import postRouter from "./postRoutes"
 
 const router = new Elysia()
-    .use(jwt({
-        name: "jwt",
-        secret: process.env.JWT_SECRET!,
-        exp: '1h'
-    }))
     .use(authRouter)
-    .use(userRouter)
-    .use(postRouter);
+    .derive(async ({ jwt, cookie: { token } }: Context) => {
+        const profile = await jwt.verify(token.value);
+        console.log(profile);
+        console.log(Date.now());
+        return {
+            profile
+        }
+    }).guard({
+        beforeHandle: ({ set, profile }: Context) => {
+            if (!profile) {
+                set.status = 401;
+                return "Unauthorized";
+            }
+        }
+    }, app => app
+        .use(userRouter)
+        .use(postRouter)
+    );
 
 export default router;

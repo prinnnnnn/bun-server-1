@@ -4,19 +4,21 @@ import { swagger } from '@elysiajs/swagger'
 import router from "./routes";
 import { logger } from "./guards/logger";
 import { jwt } from "@elysiajs/jwt";
+import cookie from "@elysiajs/cookie";
 
 const PORT = process.env.PORT!;
-const app = new Elysia();
+const app = new Elysia({ name: "server"});
 
 /* Configurations */
 app.use(cors());
 app.use(swagger());
 app.use(
     jwt({
-        name: 'myJWTNamespace',
-        secret: process.env.JWT_SECRET!
+        name: 'jwt',
+        secret: process.env.JWT_SECRET!,
+        exp: "1d"
     })
-)
+).use(cookie())
 logger(app);
 
 /* / */
