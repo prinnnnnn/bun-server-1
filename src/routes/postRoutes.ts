@@ -1,12 +1,13 @@
 import { Elysia } from "elysia"
-import { paramSchema } from "../validators/postValidators";
-import { createPost, getFollowersPost } from "../controllers/postController";
+import { createPost, getFollowersPost, likePost } from "../controllers/postController";
+import { userParamSchema } from "../validators";
+import { postParamSchema } from "../validators/postValidators";
 
 const router = new Elysia({ prefix: "/posts" })
-    .guard(paramSchema, app => 
+    .post("/", createPost)
+    .guard(userParamSchema, app => 
         app.get("/:userId/feeds", getFollowersPost)
-           .post("/", createPost)
-           .patch("/:userId/:postId", () => {})
+           .patch("/:userId/:postId", likePost, postParamSchema)
     )
 
 export default router;

@@ -38,7 +38,7 @@ interface loginBody {
     password: string
 }
 
-/* /auth/login */
+/* POST - /auth/login */
 export const login = async ({ body, set, jwt, cookie: { token } }: Context) => {
     
     try {

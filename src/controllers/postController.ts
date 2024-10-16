@@ -77,27 +77,35 @@ export const likePost = async ({ set, error, params }: Context) => {
 
         const { userId, postId } = params;
 
-        let likeRecord = await prisma.postLike.delete({
+        const likeRecord = await prisma.postLike.findFirst({
             where: {
-                id: 1,
-                // userId: Number(userId), 
-                // postId: Number(postId),
+                userId: Number(userId),
+                postId: Number(postId),
             }
-        })
+        });
 
         if (!likeRecord) {
-            likeRecord = await prisma.postLike.create({
+            const likeRecord = await prisma.postLike.create({
                 data: {
                     userId: Number(userId),
                     postId: Number(postId),
                 }
             })
+
+            return likeRecord;
+        } else {
+
+            const deletedLikeRecord = await prisma.postLike.delete({
+                where: {
+                    id: likeRecord.id,
+                }
+            })
+
+            return deletedLikeRecord;
         }
 
-        return;
-
     } catch (err) {
-        error(500);
+        set.status = 500;
         return { error: err }
     }
 
