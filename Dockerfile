@@ -1,35 +1,24 @@
-# base image
-FROM oven/bun:latest as base
-WORKDIR /usr/source
-USER bun
+FROM oven/bun:latest
 
-# install dependencies and cache them for future builds.
-FROM base AS install
-WORKDIR /temp/dev
-COPY package.json bun.lockb ./
-RUN bun install --frozen-lockfile
+# Set working directory
+WORKDIR /app
 
-# install dependencies with --production (exclude devDependencies)
-WORKDIR /temp/prod
-COPY package.json bun.lockb ./
-RUN bun install --frozen-lockfile --production
-
-# copy node_modules from temp directory
-# then copy all (non-ignored) project files into the image
-FROM base AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
+# Copy the project files to the container
 COPY . .
 
-ENV NODE_ENV=test
-# todo: add unit test command
+# Create a non-root user and set permissions for the project folder
+RUN addgroup --system appgroup && adduser --system --group appuser
+RUN chown -R appuser:appgroup /app
 
-# copy production dependencies and source code into final image
-FROM base AS production
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/source/src/ ./src/
-COPY --from=prerelease /usr/source/package.json .
+# Switch to non-root user
+USER appuser
 
-ENV NODE_ENV=production
+# Run Prisma generate
+RUN bunx prisma generate
 
-EXPOSE 8000/tcp
-ENTRYPOINT [ "bun", "run", "start" ]
+# Install dependencies
+RUN bun install --frozen-lockfile --production
+
+# Expose a port and run the application
+EXPOSE 8000
+CMD ["bun", "run", "start"]
