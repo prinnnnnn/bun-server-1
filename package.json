@@ -7,14 +7,15 @@
         "start": "bun run src/index.ts"
     },
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.675.0",
         "@elysiajs/cookie": "^0.8.0",
         "@elysiajs/cors": "^1.1.1",
         "@elysiajs/jwt": "^1.1.1",
         "@elysiajs/static": "^1.1.1",
-        "@prisma/client": "^5.20.0",
         "@elysiajs/swagger": "^1.1.5",
-        "picocolors": "^1.1.0",
+        "@prisma/client": "^5.20.0",
         "elysia": "latest",
+        "picocolors": "^1.1.0",
         "prisma": "^5.20.0"
     },
     "devDependencies": {
