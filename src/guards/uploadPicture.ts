@@ -10,6 +10,7 @@ const s3 = new S3Client({
     }
 });
 
+/* @ts-ignore */
 export const uploadImage = async ({ body: { picture }, set }: Context) => {
 
     if (!picture) {
@@ -31,12 +32,12 @@ export const uploadImage = async ({ body: { picture }, set }: Context) => {
     
         await s3.send(new PutObjectCommand(uploadParams));
     
-        const pictureUrl = `https://${Bun.env.R2_BUCKET_NAME}.r2.cloudflarestorage.com/${uniqueFilename}`;
+        const pictureUrl = `https://${process.env.R2_BUCKET_NAME}.r2.cloudflarestorage.com/${uniqueFilename}`;
     
         return {
             pictureUrl
         };
-        
+
     } catch (err) {
         set.status = 500;
         return { "error": err };
