@@ -13,12 +13,10 @@ RUN chown -R appuser:appgroup /app
 # Switch to non-root user
 USER appuser
 
-# Run Prisma generate
-RUN bunx prisma generate
-
 # Install dependencies
 RUN bun install --frozen-lockfile --production
+RUN chmod +x /start.sh
 
 # Expose a port and run the application
 EXPOSE 8000
-CMD ["bun", "run", "start"]
+CMD ["./start"]
