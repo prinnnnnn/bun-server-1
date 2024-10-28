@@ -1,6 +1,6 @@
 services:
-  backend:
-    image: prinnnnnn/indiv-server
+  server:
+    image: indiv-server
     container_name: server
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -9,7 +9,7 @@ services:
     depends_on:
       - db
     ports:
-      - "3001:6969"
+      - "3001:3001"
 
   db:
     image: postgres:latest
