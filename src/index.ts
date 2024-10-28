@@ -5,7 +5,7 @@ import router from "./routes";
 import { logger } from "./guards/logger";
 import { jwt } from "@elysiajs/jwt";
 import cookie from "@elysiajs/cookie";
-import { staticPlugin } from '@elysiajs/static'
+// import { staticPlugin } from '@elysiajs/static'
 
 const PORT = process.env.PORT!;
 const app = new Elysia({ name: "server"});
@@ -13,7 +13,7 @@ const app = new Elysia({ name: "server"});
 /* Configurations */
 app.use(cors());
 app.use(swagger());
-app.use(staticPlugin({ assets: "public/asset", prefix: "/asset"}));
+// app.use(staticPlugin({ assets: "public/asset", prefix: "/asset"}));
 app.use(
     jwt({
         name: 'jwt',

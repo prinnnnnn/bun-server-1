@@ -1,46 +1,37 @@
-import { Context } from "elysia";
 import { PutObjectCommand, S3Client, } from "@aws-sdk/client-s3"
 
 const s3 = new S3Client({
-    region: "ap-southeast-1",
-    endpoint: "'https://<your-account-id>.r2.cloudflarestorage.com",
+    region: process.env.R2_REGION,
+    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     credentials: {
-        accessKeyId: "",
-        secretAccessKey: "",
+        accessKeyId: process.env.R2_ACCESS_KEY!,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
     }
 });
 
-/* @ts-ignore */
-export const uploadImage = async ({ body: { picture }, set }: Context) => {
+export const uploadImage = async (filename: string, picture: File) => {
 
     if (!picture) {
-        set.status = 400;
-        return { "message": "no image required" };
+        throw new Error("Image is not provided");
     }
 
     try {
-        
-        const filename = picture.originalname;
-        const uniqueFilename = `${crypto.randomUUID()}${filename}`;
     
         const uploadParams = {
-            Bucket: process.env.R2_BUCKET_NAME, 
-            Key: uniqueFilename, 
+            Bucket: process.env.R2_BUCKET_NAME!, 
+            Key: filename, 
             Body: Buffer.from(picture),
             ContentType: picture.type,
         };
     
         await s3.send(new PutObjectCommand(uploadParams));
     
-        const pictureUrl = `https://${process.env.R2_BUCKET_NAME}.r2.cloudflarestorage.com/${uniqueFilename}`;
+        const pictureUrl = `https://${process.env.R2_BUCKET_NAME!}.r2.cloudflarestorage.com/${filename}`;
     
-        return {
-            pictureUrl
-        };
+        return pictureUrl;
 
     } catch (err) {
-        set.status = 500;
-        return { "error": err };
+        throw err;
     }
 
 
