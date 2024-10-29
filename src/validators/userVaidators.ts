@@ -44,3 +44,12 @@ export const loginValidator = {
         password: t.String(),
     })
 }
+
+export const userUploadValidator = {
+    params: t.Object({
+        userId: t.Number(),
+    }),
+    body: t.Object({
+        picture: t.File(),
+    })
+}

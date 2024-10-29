@@ -1,5 +1,6 @@
 import { Context } from "elysia";
 import prisma from "../config/prisma";
+import { uploadImage } from "../guards/uploadPicture";
 
 /* GET - /posts/:userId/feeds */
 export const getFollowersPost = async ({ params, set, error }: Context) => {
@@ -55,9 +56,25 @@ export const createPost = async ({ set, error, body }: Context) => {
 
     try {
 
+        /* @ts-ignore: Unreachable code error */
+        const { picture, ...bodyText } = body;
+
+        if (!picture) {
+            set.status = 400;
+            return {
+                message: "Image not found",
+            }
+        }
+        
+        const filename = `${crypto.randomUUID()}-picture.png`;
+        const uploadResult = await uploadImage(filename, picture);
+
         const newPost = await prisma.post.create({
-            /* @ts-ignore: Unreachable code error */
-            data: body,
+            data: {
+                /* @ts-ignore: Unreachable code error */
+                ...bodyText,
+                imageUrl: uploadResult.pictureUrl,
+            },
         })
 
         set.status = 201;

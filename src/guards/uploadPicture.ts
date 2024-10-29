@@ -20,7 +20,7 @@ export const uploadImage = async (filename: string, picture: File) => {
         const uploadParams = {
             Bucket: process.env.R2_BUCKET_NAME!, 
             Key: filename, 
-            Body: Buffer.from(picture),
+            Body: await picture.arrayBuffer(),
             ContentType: picture.type,
         };
     
@@ -28,7 +28,10 @@ export const uploadImage = async (filename: string, picture: File) => {
     
         const pictureUrl = `https://${process.env.R2_BUCKET_NAME!}.r2.cloudflarestorage.com/${filename}`;
     
-        return pictureUrl;
+        return {
+            pictureUrl,
+            status: 200,
+        };
 
     } catch (err) {
         throw err;
