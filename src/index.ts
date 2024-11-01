@@ -21,7 +21,7 @@ app.use(
         secret: process.env.JWT_SECRET!,
         exp: "1d"
     })
-).use(cookie())
+)
 logger(app);
 
 /* / */

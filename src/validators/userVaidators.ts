@@ -27,8 +27,9 @@ export const userParamSchema2 = {
 }
 
 export const registerValidator = {
+    
     body: t.Object({
-        email: t.String(),
+        email: t.String({ format: "email" }),
         password: t.String(),
         firstName: t.String(),
         lastName: t.String(),
@@ -36,6 +37,7 @@ export const registerValidator = {
         bio: t.Optional(t.String()),
         profileImage: t.Optional(t.File()),
     })
+    
 }
 
 export const loginValidator = {
