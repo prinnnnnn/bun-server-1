@@ -67,7 +67,7 @@ export const getUserFollowings = async ({ set, params }: Context) => {
             return [];
         }
 
-        const followings = followingsIds.map(({ following }) => following)
+        const followings = followingsIds.map(({ following: { id } }) => id)
 
         return followings;        
         
@@ -111,18 +111,25 @@ export const followUser = async ({ set, params }: Context) => {
         const parsedUserId = Number(userId);
         const parsedFollowId = Number(followId);
 
+        const followee = await prisma.user.findUnique({
+            where: {
+                id: parsedFollowId,
+            }
+        });
+
+        if (!followee) {
+            set.status = 404;
+            return {
+                error: `User id ${parsedFollowId} not found!`
+            }
+        }
+
         const result = await prisma.follower.create({
             data: {
                 followerId: parsedUserId,
                 followingId: parsedFollowId,
             }
         })
-
-        const followee = await prisma.user.findUnique({
-            where: {
-                id: result.followingId,
-            }
-        });
 
         return followee;
 
@@ -161,19 +168,19 @@ export const uploadProfilePicture = async ({ params, body, set }: Context) => {
             }
         }
     
-        const filename = `${userId}-${crypto.randomUUID()}-profile.png`;
-        const uploadResult = await uploadImage(filename, picture);
+        const filename = `${crypto.randomUUID()}-${userId}-profile.png`;
+        const { savedFilename } = await uploadImage(filename, picture);
 
-        await prisma.user.update({
+        const { password,...updatedUser } = await prisma.user.update({
             where: {
                 id: Number(userId),
             },
             data: {
-                coverPhotoUrl: uploadResult.pictureUrl,
+                coverPhotoUrl: savedFilename,
             }
         })
     
-        return uploadResult;
+        return updatedUser;
 
     } catch (err) {
         set.status = 500;
@@ -212,19 +219,19 @@ export const uploadCoverPicture = async ({ params, body, set }: Context) => {
             }
         }
     
-        const filename = `${userId}-${crypto.randomUUID()}-cover.png`;
-        const uploadResult = await uploadImage(filename, picture);
+        const filename = `${crypto.randomUUID()}-${userId}-cover.png`;
+        const { savedFilename } = await uploadImage(filename, picture);
 
-        await prisma.user.update({
+        const { password, ...updatedUser } = await prisma.user.update({
             where: {
                 id: Number(userId),
             },
             data: {
-                profilePath: uploadResult.pictureUrl,
+                profilePath: savedFilename,
             }
         })
     
-        return uploadResult;
+        return updatedUser;
 
     } catch (err) {
         set.status = 500;

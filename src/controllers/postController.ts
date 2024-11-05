@@ -2,6 +2,28 @@ import { Context } from "elysia";
 import prisma from "../config/prisma";
 import { uploadImage } from "../guards/uploadPicture";
 
+/* GET - /posts/ */
+export const getAllPosts = async ({ set }: Context) => {
+
+    try {
+
+        const allPosts = await prisma.post.findMany({
+            include: {
+                author: true,
+            }
+        });
+
+        return allPosts;    
+        
+    } catch (error) {
+        set.status = 500;
+        return {
+            error,
+        }
+    }
+
+}
+
 /* GET - /posts/:userId/feeds */
 export const getFollowersPost = async ({ params, set, error }: Context) => {
 
@@ -51,8 +73,8 @@ export const getFollowersPost = async ({ params, set, error }: Context) => {
 
 }
 
-/* POST - /posts/ */
-export const createPost = async ({ set, error, body }: Context) => {
+/* POST - /posts/:userId */
+export const createPost = async ({ set, error, body, params: { userId } }: Context) => {
 
     try {
 
@@ -66,14 +88,15 @@ export const createPost = async ({ set, error, body }: Context) => {
             }
         }
         
-        const filename = `${crypto.randomUUID()}-picture.png`;
-        const uploadResult = await uploadImage(filename, picture);
+        const filename = `${crypto.randomUUID()}-${userId}-post.png`;
+        const { savedFilename } = await uploadImage(filename, picture);
 
         const newPost = await prisma.post.create({
             data: {
                 /* @ts-ignore: Unreachable code error */
                 ...bodyText,
-                imageUrl: uploadResult.pictureUrl,
+                imageUrl: savedFilename,
+                authorId: Number(userId),
             },
         })
 
@@ -83,6 +106,28 @@ export const createPost = async ({ set, error, body }: Context) => {
     } catch (err) {
         error(500);
         return { error: err }
+    }
+
+}
+
+/*  */
+export const getLikeRecord = async ({ set, params: { userId }}: Context) => {
+
+    try {
+        
+        const likedPosts = await prisma.postLike.findMany({
+            where: {
+                userId: Number(userId),
+            }
+        })
+
+        return likedPosts;
+        
+    } catch (error) {
+        set.status = 500;
+        return {
+            error,
+        }
     }
 
 }
@@ -108,6 +153,8 @@ export const likePost = async ({ set, error, params }: Context) => {
                     postId: Number(postId),
                 }
             })
+
+            set.status = 201;
 
             return likeRecord;
         } else {

@@ -89,7 +89,7 @@ export const login = async ({ body, set, jwt, cookie: { token } }: Context) => {
             email,
         });
 
-        // token.value = jwtToken
+        token.value = jwtToken
         // set.headers["set-cookie"] = `token=${jwtToken}; Expires=${expires}; Max-Age=86400; Path=/; HttpOnly; SameSite=Strict`;
 
         return {
