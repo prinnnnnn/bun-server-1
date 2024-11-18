@@ -176,7 +176,7 @@ export const uploadProfilePicture = async ({ params, body, set }: Context) => {
                 id: Number(userId),
             },
             data: {
-                coverPhotoUrl: savedFilename,
+                profilePath: savedFilename,
             }
         })
     
@@ -227,7 +227,7 @@ export const uploadCoverPicture = async ({ params, body, set }: Context) => {
                 id: Number(userId),
             },
             data: {
-                profilePath: savedFilename,
+                coverPhotoUrl: savedFilename,
             }
         })
     

@@ -35,6 +35,7 @@ export const register = async ({ body, set, jwt, cookie: { token } }: Context) =
 
         const jwtToken = await jwt.sign({
             email: (body as any).email,
+            id: user.id,
         });
 
         set.status = 201;

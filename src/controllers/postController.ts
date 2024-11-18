@@ -13,7 +13,15 @@ export const getAllPosts = async ({ set }: Context) => {
             }
         });
 
-        return allPosts;    
+        const feedPosts = allPosts.map(post => {
+            const { password, ...authorResoponse } = post.author; 
+            return {
+                ...post,
+                author: authorResoponse,
+            }
+        });
+
+        return feedPosts;    
         
     } catch (error) {
         set.status = 500;
@@ -42,7 +50,7 @@ export const getFollowersPost = async ({ params, set, error }: Context) => {
         })
 
         if (!followings) {
-            error(404);
+            set.status = 404;
             return { message: "User has not followed anyone" }
         }
 
@@ -51,23 +59,33 @@ export const getFollowersPost = async ({ params, set, error }: Context) => {
                 prisma.post.findMany({
                     where: {
                         authorId: followingId,
-                    },
+                    }, 
+                    include: {
+                        author: true,
+                    }
                 })
             )
         );
 
-        const feedPosts = fetchedPosts.flat();
+        const feedPosts = fetchedPosts.flat().map(post => {
+            const { password, ...authorResoponse } = post.author; 
+            return {
+                ...post,
+                author: authorResoponse,
+            }
+        });
 
         if (!feedPosts) {
-            error(404);
+            set.status = 404;
             return { message: "Server can't find post of user's followings" }
         }
-
+        
         return feedPosts;
-
-
+        
+        
     } catch (err) {
-        error(500);
+        // error(500);
+        set.status = 500;
         return { error: err }
     }
 
@@ -104,7 +122,7 @@ export const createPost = async ({ set, error, body, params: { userId } }: Conte
         return newPost;
 
     } catch (err) {
-        error(500);
+        set.status = 500;
         return { error: err }
     }
 
