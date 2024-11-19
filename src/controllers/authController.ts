@@ -70,7 +70,7 @@ export const login = async ({ body, set, jwt, cookie: { token } }: Context) => {
                 email,
             },
         })
-
+        
         if (!user) {
             set.status = 404;
             return { message: "User not found" }
@@ -88,6 +88,7 @@ export const login = async ({ body, set, jwt, cookie: { token } }: Context) => {
         // const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
         const jwtToken = await jwt.sign({
             email,
+            id: user.id,
         });
 
         token.value = jwtToken

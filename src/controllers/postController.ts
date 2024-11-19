@@ -98,17 +98,23 @@ export const createPost = async ({ set, error, body, params: { userId } }: Conte
 
         /* @ts-ignore: Unreachable code error */
         const { picture, ...bodyText } = body;
+        let savedFilename: string = "";
 
-        if (!picture) {
-            set.status = 400;
-            return {
-                message: "Image not found",
+        if (picture) {
+            const filename = `${crypto.randomUUID()}-${userId}-post.png`;
+            const response = await uploadImage(filename, picture);
+
+            if (response.status != 200) {
+                set.status = 500;
+                return {
+                    "error": "Error upload image"
+                }
             }
+
+            savedFilename = response.savedFilename;
+
         }
         
-        const filename = `${crypto.randomUUID()}-${userId}-post.png`;
-        const { savedFilename } = await uploadImage(filename, picture);
-
         const newPost = await prisma.post.create({
             data: {
                 /* @ts-ignore: Unreachable code error */
