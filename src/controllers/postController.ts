@@ -32,12 +32,12 @@ export const getAllPosts = async ({ set }: Context) => {
 
 }
 
-/* GET - /posts/:userId/feeds */
-export const getFollowersPost = async ({ params, set, error }: Context) => {
+/* GET - /posts/feeds */
+export const getFollowersPost = async ({ params, set, profile }: Context) => {
 
     try {
 
-        const { userId } = params;
+        const userId = profile.id;
 
         const followings = await prisma.follower.findMany({
             where: {
@@ -91,13 +91,19 @@ export const getFollowersPost = async ({ params, set, error }: Context) => {
 
 }
 
-/* POST - /posts/:userId */
-export const createPost = async ({ set, error, body, params: { userId } }: Context) => {
+/* POST - /posts/ */
+export const createPost = async ({ set, error, body, profile }: Context) => {
 
     try {
 
+        // console.log(`creating a new post`);
+        // console.log(profile);
+
+        // const { id } = profile;
+        const userId = profile.id;
+
         /* @ts-ignore: Unreachable code error */
-        const { picture, ...bodyText } = body;
+        const { picture, content } = body;
         let savedFilename: string = "";
 
         if (picture) {
@@ -118,7 +124,7 @@ export const createPost = async ({ set, error, body, params: { userId } }: Conte
         const newPost = await prisma.post.create({
             data: {
                 /* @ts-ignore: Unreachable code error */
-                ...bodyText,
+                content: content ? content : "",
                 imageUrl: savedFilename,
                 authorId: Number(userId),
             },

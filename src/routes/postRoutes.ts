@@ -4,12 +4,11 @@ import { userParamSchema } from "../validators";
 import { postParamSchema } from "../validators/postValidators";
 
 const router = new Elysia({ prefix: "/posts" })
-    .get("/", getAllPosts)
-    .post("/:userId", createPost)
-    .guard(userParamSchema, app => 
-        app.get("/:userId/feeds", getFollowersPost)
-           .get("/likesRecord/:userId", getLikeRecord)
-           .patch("/:userId/:postId", likePost, postParamSchema)
-    )
+    .get("/", getAllPosts) 
+    .get("/feeds", getFollowersPost)
+    .post("/", createPost)
+    .get("/likesRecord/", getLikeRecord)
+    .patch("/:postId", likePost, postParamSchema)
+    
 
 export default router;
