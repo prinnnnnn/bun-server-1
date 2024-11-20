@@ -91,6 +91,39 @@ export const getFollowersPost = async ({ params, set, profile }: Context) => {
 
 }
 
+export const getUserPost = async ({ set, profile }: Context) => {
+    
+    try {
+
+        const userId = profile.id;
+
+        const userPosts = await prisma.post.findMany({
+            where: {
+                authorId: userId,
+            },
+            include: {
+                author: true,
+            }
+        })
+
+        if (!userPosts) {
+            set.status = 404;
+            return {
+                "message": "posts not found"
+            }
+        }
+
+        return userPosts;
+        
+    } catch (error) {
+        set.status = 500;
+        return {
+            error,
+        }
+    }
+
+}
+
 /* POST - /posts/ */
 export const createPost = async ({ set, error, body, profile }: Context) => {
 

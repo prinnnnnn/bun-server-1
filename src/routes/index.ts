@@ -12,7 +12,7 @@ const router = new Elysia()
         console.log(profile);
 
         return {
-            profile
+            profile,
         }
     }).guard({
         /* @ts-ignore */
