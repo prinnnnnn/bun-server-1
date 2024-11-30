@@ -13,13 +13,20 @@ export const getAllPosts = async ({ set }: Context) => {
             }
         });
 
-        const feedPosts = allPosts.map(post => {
-            const { password, ...authorResoponse } = post.author; 
-            return {
-                ...post,
-                author: authorResoponse,
-            }
-        });
+        const feedPosts = await Promise.all(
+            allPosts.map(async (post) => {
+                const { password, ...authorResponse } = post.author;
+                /* @ts-ignore */
+                const { count } = (await prisma.$queryRaw`SELECT COUNT(*) FROM "PostLike" WHERE "postId" = ${post.id}`)[0];
+                // console.log();
+                return {
+                    ...post,
+                    likeCounts: Number(count),
+                    author: authorResponse,
+                };
+            })
+        );
+        
 
         return feedPosts;    
         
@@ -129,10 +136,6 @@ export const createPost = async ({ set, error, body, profile }: Context) => {
 
     try {
 
-        // console.log(`creating a new post`);
-        // console.log(profile);
-
-        // const { id } = profile;
         const userId = profile.id;
 
         /* @ts-ignore: Unreachable code error */
@@ -140,17 +143,19 @@ export const createPost = async ({ set, error, body, profile }: Context) => {
         let savedFilename: string = "";
 
         if (picture) {
+            // console.log("Picture attached");
             const filename = `${crypto.randomUUID()}-${userId}-post.png`;
             const response = await uploadImage(filename, picture);
 
             if (response.status != 200) {
                 set.status = 500;
+                console.log(response);
                 return {
-                    "error": "Error upload image"
+                    error: response.error,
                 }
             }
 
-            savedFilename = response.savedFilename;
+            savedFilename = response.savedFilename!;
 
         }
         
@@ -174,17 +179,17 @@ export const createPost = async ({ set, error, body, profile }: Context) => {
 }
 
 /*  */
-export const getLikeRecord = async ({ set, params: { userId }}: Context) => {
+export const getLikeRecord = async ({ set, profile }: Context) => {
 
     try {
         
         const likedPosts = await prisma.postLike.findMany({
             where: {
-                userId: Number(userId),
+                userId: Number(profile.id),
             }
         })
 
-        return likedPosts;
+        return likedPosts.map(likeRecord => likeRecord.postId);
         
     } catch (error) {
         set.status = 500;
@@ -195,12 +200,13 @@ export const getLikeRecord = async ({ set, params: { userId }}: Context) => {
 
 }
 
-/* PATCH - /posts/:userId/:postId */
-export const likePost = async ({ set, error, params }: Context) => {
+/* PATCH - /posts/:postId */
+export const likePost = async ({ set, error, params, profile }: Context) => {
 
     try {
 
-        const { userId, postId } = params;
+        const userId: number = profile.id;
+        const { postId } = params;
 
         const likeRecord = await prisma.postLike.findFirst({
             where: {

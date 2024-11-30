@@ -23,10 +23,12 @@ export const uploadImage = async (filename: string, picture: File) => {
             Body: await picture.arrayBuffer(),
             ContentType: picture.type,
         };
+
+        // console.log(uploadParams);
     
         await s3.send(new PutObjectCommand(uploadParams));
     
-        const pictureUrl = `https://${process.env.R2_BUCKET_NAME!}.r2.cloudflarestorage.com/${filename}`;
+        // const pictureUrl = `https://${process.env.R2_BUCKET_NAME!}.r2.cloudflarestorage.com/${filename}`;
     
         return {
             savedFilename: filename,
@@ -34,7 +36,11 @@ export const uploadImage = async (filename: string, picture: File) => {
         };
 
     } catch (err) {
-        throw err;
+        console.error(err);
+        return {
+            status: 500,
+            error: err,
+        }
     }
 
 

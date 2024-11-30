@@ -9,7 +9,7 @@ const router = new Elysia()
     .derive(async ({ jwt, cookie: { token } }: Context) => {
         const profile = await jwt.verify(token.value);
         
-        console.log(profile);
+        // console.log(profile);
 
         return {
             profile,

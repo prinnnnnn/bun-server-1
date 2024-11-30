@@ -14,7 +14,7 @@ export const userBodySchema = {
 /* for /users/:userId */
 export const userParamSchema = {
     params: t.Object({
-        userId: t.Number(),
+        userId: t.Optional(t.Number()),
     })
 }
 

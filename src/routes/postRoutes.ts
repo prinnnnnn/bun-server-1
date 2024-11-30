@@ -10,6 +10,5 @@ const router = new Elysia({ prefix: "/posts" })
     .post("/", createPost)
     .get("/likesRecord/", getLikeRecord)
     .patch("/:postId", likePost, postParamSchema)
-    
 
 export default router;
