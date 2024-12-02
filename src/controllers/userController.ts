@@ -23,15 +23,36 @@ export const getAllUsers = async ({ set }: Context) => {
 
 }
 
-/* GET - /:userId */
-export const getUserById = async ({ params, error, set, profile }: Context) => {
+/* GET - /profile */
+export const getLoggedInUser = async ({ set, profile }: Context) => {
 
     try {
 
         const userId = profile.id as number;
         // console.log(typeof userId);
-
         const { password, ...userResposne } = await prisma.user.findUnique({ where: { id: Number(userId) } });
+
+        if (!userResposne) {
+            set.status = 404;
+            return { message: "User not found" };
+        }
+
+        return userResposne;
+
+    } catch (err) {
+        set.status = 500;
+        return { error: err }
+    }
+
+}
+
+/* GET - /:userId */
+export const getUserById = async ({ params, set }: Context) => {
+
+    try {
+
+        const userId = params.userId as number;
+        const { password, ...userResposne } = await prisma.user.findUnique({ where: { id: userId } });
 
         if (!userResposne) {
             set.status = 404;
@@ -141,7 +162,7 @@ export const followUser = async ({ set, params }: Context) => {
 
 }
 
-/* POST - /upload/profilePicture/:userId */
+/* PATCH - /upload/profilePicture/:userId */
 export const uploadProfilePicture = async ({ params, body, set }: Context) => {
 
     try {
@@ -192,7 +213,7 @@ export const uploadProfilePicture = async ({ params, body, set }: Context) => {
 
 }
 
-/* POST - /upload/coverPicture/:userId */
+/* PATCH - /upload/coverPicture/:userId */
 export const uploadCoverPicture = async ({ params, body, set }: Context) => {
 
     try {

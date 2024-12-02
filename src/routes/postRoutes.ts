@@ -6,6 +6,7 @@ import { postParamSchema } from "../validators/postValidators";
 const router = new Elysia({ prefix: "/posts" })
     .get("/", getAllPosts) 
     .get("/feeds", getFollowersPost)
+    // .get("/user", getUserPost)
     .get("/user", getUserPost)
     .post("/", createPost)
     .get("/likesRecord/", getLikeRecord)
