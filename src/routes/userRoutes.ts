@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { followUser, getLoggedInUser, getRandomUsers, getUserById, getUserFollowings, updateUserInfo, uploadCoverPicture, uploadProfilePicture } from "../controllers/userController";
+import { followUser, getLoggedInUser, getRandomUsers, getUserById, getUserFollowings, unfollowUser, updateUserInfo, uploadCoverPicture, uploadProfilePicture } from "../controllers/userController";
 import { userParamSchema, userParamSchema2, userUploadValidator } from "../validators/userVaidators";
 
 const router = new Elysia({ prefix: "/users" })
@@ -9,8 +9,9 @@ const router = new Elysia({ prefix: "/users" })
     .get("/following/", getUserFollowings)
     .get("/random", getRandomUsers)
     .patch("/:userId", updateUserInfo)
-    .patch("/follow/:followId", followUser, userParamSchema2)
-    .patch("/upload/profilePicture/:userId", uploadProfilePicture, userUploadValidator)
-    .patch("/upload/coverPicture/:userId", uploadCoverPicture, userUploadValidator)
+    .patch("/follow/:followId", followUser, userParamSchema)
+    .patch("/unfollow/:followId", unfollowUser, userParamSchema)
+    .patch("/upload/profilePicture", uploadProfilePicture, userUploadValidator)
+    .patch("/upload/coverPicture", uploadCoverPicture, userUploadValidator)
 
 export default router;

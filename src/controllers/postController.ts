@@ -45,20 +45,50 @@ export const getRandomPosts = async ({ profile, set }: Context) => {
     try {
 
         const randomPosts = await prisma.$queryRaw`
-        SELECT distinct P.*
+        -- SELECT distinct P.*
+        -- FROM "Post" P
+        -- full outer join "PostLike" L on P."id"=L."postId"
+        -- where L."userId" is null
+        -- limit 50
+        SELECT P."id"
         FROM "Post" P
         full outer join "PostLike" L on P."id"=L."postId"
-        where L."userId" != ${profile.id}
-        limit 50`;
+        -- join "User" U on U."id"=P."authorId"
+        where L."userId" is null or L."userId" != ${profile.id}
+        limit 50
+        `;
 
-        return randomPosts;
+        const posts = await Promise.all(randomPosts.map(async ({ id }) => {
+
+            const postWithUser = await prisma.post.findUnique({
+                where: {
+                    id,
+                },
+                include: {
+                    author: true,
+                }
+            });
+
+            const { password, ...authorResponse } = postWithUser.author;
+            const [{ count }] = await prisma.$queryRaw`SELECT COUNT(*) FROM "PostLike" WHERE "postId" = ${id}`;
+
+            return {
+                ...postWithUser,
+                likeCounts: Number(count),
+                author: authorResponse,
+            };
+        }
+
+        ))
+
+return posts;
 
     } catch (error) {
-        set.status = 500;
-        return {
-            error,
-        }
+    set.status = 500;
+    return {
+        error,
     }
+}
 
 }
 

@@ -153,7 +153,9 @@ export const followUser = async ({ set, params, profile }: Context) => {
             }
         })
 
-        return followee;
+        const { password, ...followResponse } = followee;
+
+        return followResponse;
 
     } catch (err) {
         set.status = 500;
@@ -162,12 +164,52 @@ export const followUser = async ({ set, params, profile }: Context) => {
 
 }
 
-/* PATCH - /upload/profilePicture/:userId */
-export const uploadProfilePicture = async ({ params, body, set }: Context) => {
+/* PATCH - /unfollow/:followId */
+export const unfollowUser = async ({ set, params, profile }: Context) => {
 
     try {
 
-        const { userId } = params;
+        const { followId } = params;
+        const parsedUserId = Number(profile.id);
+        const parsedFollowId = Number(followId);
+
+        const followee = await prisma.user.findUnique({
+            where: {
+                id: parsedFollowId,
+            }
+        });
+
+        if (!followee) {
+            set.status = 404;
+            return {
+                error: `User id ${parsedFollowId} not found!`
+            }
+        }
+
+        const result = await prisma.follower.deleteMany({
+            where: {
+                followerId: parsedUserId,
+                followingId: parsedFollowId,
+            }
+        })
+
+        const { password, ...followResponse } = followee;
+
+        return followResponse;
+
+    } catch (err) {
+        set.status = 500;
+        return { error: err }
+    }
+
+}
+
+/* PATCH - /upload/profilePicture */
+export const uploadProfilePicture = async ({ profile, body, set }: Context) => {
+
+    try {
+
+        const userId = profile.id;
         const { picture } = body as { picture: File };
 
         if (!picture) {
@@ -213,12 +255,12 @@ export const uploadProfilePicture = async ({ params, body, set }: Context) => {
 
 }
 
-/* PATCH - /upload/coverPicture/:userId */
-export const uploadCoverPicture = async ({ params, body, set }: Context) => {
+/* PATCH - /upload/coverPicture */
+export const uploadCoverPicture = async ({ profile, body, set }: Context) => {
 
     try {
 
-        const { userId } = params;
+        const userId = profile.id;
         const { picture } = body as { picture: File };
 
         if (!picture) {
