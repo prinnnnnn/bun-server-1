@@ -26,10 +26,33 @@ export const getAllPosts = async ({ set }: Context) => {
                 };
             })
         );
-        
 
-        return feedPosts;    
-        
+
+        return feedPosts;
+
+    } catch (error) {
+        set.status = 500;
+        return {
+            error,
+        }
+    }
+
+}
+
+/* GET - /posts/random */
+export const getRandomPosts = async ({ profile, set }: Context) => {
+
+    try {
+
+        const randomPosts = await prisma.$queryRaw`
+        SELECT distinct P.*
+        FROM "Post" P
+        full outer join "PostLike" L on P."id"=L."postId"
+        where L."userId" != ${profile.id}
+        limit 50`;
+
+        return randomPosts;
+
     } catch (error) {
         set.status = 500;
         return {
@@ -40,7 +63,7 @@ export const getAllPosts = async ({ set }: Context) => {
 }
 
 /* GET - /posts/feeds */
-export const getFollowersPost = async ({ params, set, profile }: Context) => {
+export const getFollowersPost = async ({ set, profile }: Context) => {
 
     try {
 
@@ -66,7 +89,7 @@ export const getFollowersPost = async ({ params, set, profile }: Context) => {
                 prisma.post.findMany({
                     where: {
                         authorId: followingId,
-                    }, 
+                    },
                     include: {
                         author: true,
                     }
@@ -75,7 +98,7 @@ export const getFollowersPost = async ({ params, set, profile }: Context) => {
         );
 
         const feedPosts = fetchedPosts.flat().map(post => {
-            const { password, ...authorResoponse } = post.author; 
+            const { password, ...authorResoponse } = post.author;
             return {
                 ...post,
                 author: authorResoponse,
@@ -86,10 +109,10 @@ export const getFollowersPost = async ({ params, set, profile }: Context) => {
             set.status = 404;
             return { message: "Server can't find post of user's followings" }
         }
-        
+
         return feedPosts;
-        
-        
+
+
     } catch (err) {
         // error(500);
         set.status = 500;
@@ -99,7 +122,7 @@ export const getFollowersPost = async ({ params, set, profile }: Context) => {
 }
 
 export const getUserPost = async ({ set, profile }: Context) => {
-    
+
     try {
 
         const userId = profile.id;
@@ -121,7 +144,7 @@ export const getUserPost = async ({ set, profile }: Context) => {
         }
 
         return userPosts;
-        
+
     } catch (error) {
         set.status = 500;
         return {
@@ -158,7 +181,7 @@ export const createPost = async ({ set, error, body, profile }: Context) => {
             savedFilename = response.savedFilename!;
 
         }
-        
+
         const newPost = await prisma.post.create({
             data: {
                 /* @ts-ignore: Unreachable code error */
@@ -182,7 +205,7 @@ export const createPost = async ({ set, error, body, profile }: Context) => {
 export const getLikeRecord = async ({ set, profile }: Context) => {
 
     try {
-        
+
         const likedPosts = await prisma.postLike.findMany({
             where: {
                 userId: Number(profile.id),
@@ -190,7 +213,7 @@ export const getLikeRecord = async ({ set, profile }: Context) => {
         })
 
         return likedPosts.map(likeRecord => likeRecord.postId);
-        
+
     } catch (error) {
         set.status = 500;
         return {

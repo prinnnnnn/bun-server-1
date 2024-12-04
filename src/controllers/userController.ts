@@ -124,13 +124,13 @@ export const updateUserInfo = async ({ set, body, params }: Context) => {
 
 }
 
-/* PATCH - /:userId/:followId */
-export const followUser = async ({ set, params }: Context) => {
+/* PATCH - /follow/:followId */
+export const followUser = async ({ set, params, profile }: Context) => {
 
     try {
 
-        const { userId, followId } = params;
-        const parsedUserId = Number(userId);
+        const { followId } = params;
+        const parsedUserId = Number(profile.id);
         const parsedFollowId = Number(followId);
 
         const followee = await prisma.user.findUnique({

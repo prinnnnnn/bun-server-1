@@ -9,7 +9,7 @@ const router = new Elysia({ prefix: "/users" })
     .get("/following/", getUserFollowings)
     .get("/random", getRandomUsers)
     .patch("/:userId", updateUserInfo)
-    .patch("/:userId/:followId", followUser, userParamSchema2)
+    .patch("/follow/:followId", followUser, userParamSchema2)
     .patch("/upload/profilePicture/:userId", uploadProfilePicture, userUploadValidator)
     .patch("/upload/coverPicture/:userId", uploadCoverPicture, userUploadValidator)
 
