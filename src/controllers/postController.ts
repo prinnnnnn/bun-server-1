@@ -127,13 +127,25 @@ export const getFollowersPost = async ({ set, profile }: Context) => {
             )
         );
 
-        const feedPosts = fetchedPosts.flat().map(post => {
-            const { password, ...authorResoponse } = post.author;
+        // const feedPosts = fetchedPosts.flat().map(async (post) => {
+        //     const { password, ...authorResoponse } = post.author;
+        //     const [{ count }] = await prisma.$queryRaw`SELECT COUNT(*) FROM "PostLike" WHERE "postId" = ${post.id}`;
+        //     return {
+        //         ...post,
+        //         author: authorResoponse,
+        //         likeCounts: Number(count),
+        //     }
+        // });
+
+        const feedPosts = await Promise.all(fetchedPosts.flat().map(async (post) => {
+            const { password, ...authorResponse } = post.author;
+            const [{ count }] = await prisma.$queryRaw`SELECT COUNT(*) FROM "PostLike" WHERE "postId" = ${post.id}`;
             return {
                 ...post,
-                author: authorResoponse,
+                author: authorResponse,
+                likeCounts: Number(count),
             }
-        });
+        }));
 
         if (!feedPosts) {
             set.status = 404;
@@ -173,7 +185,17 @@ export const getUserPost = async ({ set, profile }: Context) => {
             }
         }
 
-        return userPosts;
+        const userPostsWithLikes = await Promise.all(userPosts.map(async (post) => {
+            const { password, ...authorResponse } = post.author;
+            const [{ count }] = await prisma.$queryRaw`SELECT COUNT(*) FROM "PostLike" WHERE "postId" = ${post.id}`;
+            return {
+                ...post,
+                author: authorResponse,
+                likeCounts: Number(count),
+            }
+        }));
+
+        return userPostsWithLikes;
 
     } catch (error) {
         set.status = 500;
@@ -222,7 +244,7 @@ export const createPost = async ({ set, error, body, profile }: Context) => {
         })
 
         set.status = 201;
-        return newPost;
+        return { ...newPost, likeCounts: 0 };
 
     } catch (err) {
         set.status = 500;
