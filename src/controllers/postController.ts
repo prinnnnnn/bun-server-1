@@ -163,15 +163,16 @@ export const getFollowersPost = async ({ set, profile }: Context) => {
 
 }
 
-export const getUserPost = async ({ set, profile }: Context) => {
+/* GET - /posts/user/:userId */
+export const getUserPost = async ({ set, profile, params }: Context) => {
 
     try {
 
-        const userId = profile.id;
+        const { userId } = params;
 
         const userPosts = await prisma.post.findMany({
             where: {
-                authorId: userId,
+                authorId: Number(userId),
             },
             include: {
                 author: true,
