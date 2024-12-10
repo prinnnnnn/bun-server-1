@@ -48,9 +48,6 @@ export const loginValidator = {
 }
 
 export const userUploadValidator = {
-    params: t.Object({
-        userId: t.Number(),
-    }),
     body: t.Object({
         picture: t.File(),
     })
